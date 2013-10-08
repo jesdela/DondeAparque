@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_coche"
+        android:orderInCategory="100"
+        android:title="Coche"/>
+    <item android:id="@+id/menu_yo" android:title="Mi posición" android:orderInCategory="100"></item>
+    <item android:id="@+id/guardar" android:title="Guardar posición" android:orderInCategory="100"></item>
+    <item android:id="@+id/ayuda" android:title="Ayuda" android:orderInCategory="100"></item>
+
+</menu>
