@@ -11,6 +11,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -37,54 +38,44 @@ public class MainActivity extends Activity {
 		// getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 		// WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_main);
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		Location location = locationManager
-				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		if (location != null) {
-			String lo = "" + location.getLatitude();
+		SharedPreferences preferences = getSharedPreferences("opciones",
+				MODE_PRIVATE);
+		if (preferences.getBoolean("habil", false)) {
+			startActivity(new Intent(MainActivity.this, Mapa.class));
+			finish();
 		}
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		final Location location = locationManager
+				.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		locationListener = new LocationListener() {
-			public void onLocationChanged(Location location) {
-				if (location != null) {
-					String lo = "" + location.getLatitude();
-				}
+
+			@Override
+			public void onStatusChanged(String provider, int status,
+					Bundle extras) {
+				// TODO Auto-generated method stub
+
 			}
 
+			@Override
+			public void onProviderEnabled(String provider) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
 			public void onProviderDisabled(String provider) {
+				// TODO Auto-generated method stub
 				showDialog(2);
 			}
 
-			public void onProviderEnabled(String provider) {
-
-			}
-
-			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
-				Log.i("LocAndroid", "Provider Status: " + status);
+			@Override
+			public void onLocationChanged(Location location) {
+				// TODO Auto-generated method stub
 
 			}
 		};
-		locationManager.requestLocationUpdates(a, 500, 1, locationListener);
-		int hab = 0;
-		try {
-			BufferedReader habil = new BufferedReader(new FileReader(
-					getFilesDir() + "/habilitado.txt"));
-			hab = Integer.parseInt(habil.readLine());
-			habil.close();
-			Log.d("a", "" + hab);
-			if (hab == 1) {
-				locationManager.removeUpdates(locationListener);
-				startActivity(new Intent(MainActivity.this, Mapa.class));
-				finish();
-			} else {
-				Log.d("a", "" + hab);
-			}
-
-		} catch (Exception e) {
-			Log.d("TAG", "TAG: Error al leer ");
-			e.printStackTrace();
-
-		}
+		locationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 		ImageView ayuda = (ImageView) findViewById(R.id.boton_ayuda);
 		ayuda.setColorFilter(Color.parseColor("#84C225"));
 		ayuda.setOnClickListener(new OnClickListener() {
@@ -101,73 +92,28 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				actualizarPosicion();
+				actualizarPosicion(location);
 
 			}
 		});
 
 	}
 
-	private void actualizarPosicion() {
+	private void actualizarPosicion(Location location) {
 		// Obtenemos una referencia al LocationManager
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-		// Obtenemos la última posición conocida
-		Location location = locationManager.getLastKnownLocation(a);
-
-		// Mostramos la última posición conocida
-		muestraPosicion(location);
-
-		// Nos registramos para recibir actualizaciones de la posición
-		locationListener = new LocationListener() {
-			public void onLocationChanged(Location location) {
-
-			}
-
-			public void onProviderDisabled(String provider) {
-
-			}
-
-			public void onProviderEnabled(String provider) {
-
-			}
-
-			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
-				Log.i("LocAndroid", "Provider Status: " + status);
-
-			}
-		};
-
-	}
-
-	private void muestraPosicion(Location loc) {
-		if (loc != null) {
-			try {
-				BufferedWriter fichero = new BufferedWriter(new FileWriter(
-						getFilesDir() + "/posicion.txt"));
-				String pos = "" + loc.getLatitude();
-				fichero.write((String) pos);
-				fichero.newLine();
-				pos = "" + loc.getLongitude();
-				fichero.write((String) pos);
-				fichero.close();
-				BufferedWriter habil = new BufferedWriter(new FileWriter(
-						getFilesDir() + "/habilitado.txt"));
-				String a = "1";
-				habil.write(a);
-				habil.close();
-				locationManager.removeUpdates(locationListener);
-				startActivity(new Intent(MainActivity.this, Mapa.class));
-				finish();
-			} catch (Exception ex) {
-				Log.e("Ficheros", "Error al escribir fichero a memoria interna");
-			}
-
+		if (location != null) {
+			SharedPreferences preferences = getSharedPreferences("opciones",
+					MODE_PRIVATE);
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putBoolean("habil", true);
+			editor.putFloat("latitud", (float) location.getLatitude());
+			editor.putFloat("longitud", (float) location.getLongitude());
+			editor.commit();
+			locationManager.removeUpdates(locationListener);
+			startActivity(new Intent(MainActivity.this, Mapa.class));
+			finish();
 		} else {
-				showDialog(0);
-
-			// buscar.setEnabled(false);
+			showDialog(0);
 		}
 
 	}
@@ -213,8 +159,8 @@ public class MainActivity extends Activity {
 			break;
 		case 2:
 			AlertDialog.Builder dialogo2 = new AlertDialog.Builder(this);
-			dialogo2.setMessage("¿Ir a ajustes del GPS?")
-					.setTitle("GPS APAGADO")
+			dialogo2.setMessage("¿Usar Wi-Fi para obtener posición?")
+					.setTitle("SIN DATOS WI-FI")
 					.setPositiveButton("Aceptar",
 							new DialogInterface.OnClickListener() {
 
@@ -249,11 +195,11 @@ public class MainActivity extends Activity {
 		return dialog;
 	}
 
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			showDialog(1);
-		}
-		return true;
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		showDialog(1);
+		super.onBackPressed();
 	}
 
 }

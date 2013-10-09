@@ -22,6 +22,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -58,30 +59,19 @@ public class Mapa extends android.support.v4.app.FragmentActivity {
 		super.onCreate(saveInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_mapas);
-		String linea;
-
-		try {
-			BufferedReader fichero = new BufferedReader(new FileReader(
-					getFilesDir() + "/posicion.txt"));
-			linea = fichero.readLine();
-			lat = Double.parseDouble(linea);
-			linea = fichero.readLine();
-			lon = Double.parseDouble(linea);
-			fichero.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-			lat = lon = 0;
-		}
+		SharedPreferences preferences = getSharedPreferences("opciones",
+				MODE_PRIVATE);
+		lat = preferences.getFloat("latitud", 0);
+		lon = preferences.getFloat("longitud", 0);
 		mapa = ((SupportMapFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.map)).getMap();
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		Location loc = locationManager
-				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+				.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		actualizarposicion(loc);
 
 		locationListener = new LocationListener() {
 			public void onLocationChanged(Location location) {
-				mapa.clear();
 				actualizarposicion(location);
 			}
 
@@ -108,51 +98,54 @@ public class Mapa extends android.support.v4.app.FragmentActivity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
-		if(item.getItemId()==R.id.menu_yo){
-			CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2), 18,0,0);
+		if (item.getItemId() == R.id.menu_yo) {
+			CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
+					18, 0, 0);
 			CameraUpdate camUpd2 = CameraUpdateFactory
 					.newCameraPosition(campos2);
 			mapa.animateCamera(camUpd2);
-		}else if (item.getItemId()==R.id.menu_coche) {
+		} else if (item.getItemId() == R.id.menu_coche) {
 			CameraPosition camPos3 = new CameraPosition(new LatLng(lat, lon),
 					18, 0, 0);
 			mapa.animateCamera(CameraUpdateFactory.newCameraPosition(camPos3));
-		}else if (item.getItemId()==R.id.guardar) {
+		} else if (item.getItemId() == R.id.guardar) {
 			showDialog(0);
-		}else if (item.getItemId()==R.id.ayuda) {
+		} else if (item.getItemId() == R.id.ayuda) {
 			startActivity(new Intent(Mapa.this, Ayuda.class));
 		}
-		
+
 		return super.onOptionsItemSelected(item);
 	}
-//	@Override
-//	public boolean onOptionsItemSelected(MenuItem item) {
-//		switch (item.getItemId()) {
-//		case R.id.menu_yo:
-//			CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
-//					18, 0, 0);
-//			// Centramos el mapa en España y con nivel de zoom 5
-//			CameraUpdate camUpd2 = CameraUpdateFactory
-//					.newCameraPosition(campos2);
-//			mapa.animateCamera(camUpd2);
-//			break;
-//		case R.id.menu_coche:
-//			CameraPosition camPos3 = new CameraPosition(new LatLng(lat, lon),
-//					18, 0, 0);
-//			mapa.animateCamera(CameraUpdateFactory.newCameraPosition(camPos3));
-//			break;
-//		case R.id.guardar:
-//			showDialog(0);
-//			break;
-//		case R.id.ayuda:
-//			startActivity(new Intent(Mapa.this, Ayuda.class));
-//			break;
-//		}
-//		return super.onOptionsItemSelected(item);
-//	}
+
+	// @Override
+	// public boolean onOptionsItemSelected(MenuItem item) {
+	// switch (item.getItemId()) {
+	// case R.id.menu_yo:
+	// CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
+	// 18, 0, 0);
+	// // Centramos el mapa en España y con nivel de zoom 5
+	// CameraUpdate camUpd2 = CameraUpdateFactory
+	// .newCameraPosition(campos2);
+	// mapa.animateCamera(camUpd2);
+	// break;
+	// case R.id.menu_coche:
+	// CameraPosition camPos3 = new CameraPosition(new LatLng(lat, lon),
+	// 18, 0, 0);
+	// mapa.animateCamera(CameraUpdateFactory.newCameraPosition(camPos3));
+	// break;
+	// case R.id.guardar:
+	// showDialog(0);
+	// break;
+	// case R.id.ayuda:
+	// startActivity(new Intent(Mapa.this, Ayuda.class));
+	// break;
+	// }
+	// return super.onOptionsItemSelected(item);
+	// }
 
 	@Override
 	protected void onDestroy() {
@@ -256,8 +249,8 @@ public class Mapa extends android.support.v4.app.FragmentActivity {
 			break;
 		case 3:
 			AlertDialog.Builder dialogo3 = new AlertDialog.Builder(this);
-			dialogo3.setMessage("¿Ir a ajustes del GPS?")
-					.setTitle("GPS APAGADO")
+			dialogo3.setMessage("¿Usar Wi-Fi para obtener posición?")
+					.setTitle("SIN DATOS WI-FI")
 					.setPositiveButton("Aceptar",
 							new DialogInterface.OnClickListener() {
 
@@ -283,9 +276,9 @@ public class Mapa extends android.support.v4.app.FragmentActivity {
 		if (location != null) {
 			lat2 = location.getLatitude();
 			lon2 = location.getLongitude();
+			ruta();
 			mostrarMarcador(lat, lon, 0);
 			mostrarMarcador(lat2, lon2, 1);
-			ruta();
 			CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
 					18, 60, location.getBearing());
 			CameraUpdate camUpd2 = CameraUpdateFactory
@@ -314,6 +307,7 @@ public class Mapa extends android.support.v4.app.FragmentActivity {
 
 	private void ruta() {
 		JSONObject json = this.rutaEntreDosPuntos();
+		mapa.clear();
 		try {
 			ArrayList<LatLng> puntosRuta = new ArrayList<LatLng>();
 			JSONArray ruta = json.getJSONArray("routes").getJSONObject(0)
