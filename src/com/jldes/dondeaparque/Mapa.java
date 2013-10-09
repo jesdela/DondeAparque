@@ -76,7 +76,7 @@ public class Mapa extends android.support.v4.app.FragmentActivity {
 			}
 
 			public void onProviderDisabled(String provider) {
-				showDialog(3);
+//				showDialog(3);
 			}
 
 			public void onProviderEnabled(String provider) {
