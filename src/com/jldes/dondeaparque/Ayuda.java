@@ -1,27 +1,39 @@
 package com.jldes.dondeaparque;
 
-import android.app.Activity;
-import android.content.res.Resources;
-import android.os.Bundle;
-import android.view.Window;
-import android.widget.TabHost;
 
-public class Ayuda extends Activity{
+import android.os.Bundle;
+
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+
+public class Ayuda extends SherlockActivity {
 	@Override
-	public void onCreate(Bundle savedInstanceState){
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_ayuda);
-		Resources res = getResources();
-		TabHost tab = (TabHost)findViewById(android.R.id.tabhost);
-		tab.setup();
-		TabHost.TabSpec spec=tab.newTabSpec("tabayuda");
-		spec.setContent(R.id.Ayuda);
-		spec.setIndicator("Ayuda");
-		tab.addTab(spec);
-		tab.setCurrentTab(0);
+		getSupportActionBar().setBackgroundDrawable(
+				getResources().getDrawable(R.drawable.fondoabar));
+		getSupportActionBar().setIcon(
+				getResources().getDrawable(R.drawable.titulo));
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
-	public void onBackPressed(){
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			break; 
+ 
+		default:
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	public void onBackPressed() {
 		finish();
 	}
 }

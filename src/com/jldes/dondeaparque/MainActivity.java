@@ -1,43 +1,109 @@
 package com.jldes.dondeaparque;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
-public class MainActivity extends Activity {
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+
+public class MainActivity extends SherlockActivity {
 	private LocationManager locationManager;
 	private LocationListener locationListener;
-	private String a = LocationManager.GPS_PROVIDER;
+	private Thread tiempo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		// getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-		// WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		getSupportActionBar().setBackgroundDrawable(
+				getResources().getDrawable(R.drawable.fondoabar));
+		getSupportActionBar().setIcon(
+				getResources().getDrawable(R.drawable.titulo));
 		setContentView(R.layout.activity_main);
+		comprovarconexion();
+		empezar();
+	}
+
+	private void comprovarconexion() {
+		// TODO Auto-generated method stub
+		AlertDialog.Builder dialogo3 = new AlertDialog.Builder(this);
+		dialogo3.setMessage(
+				"Comprueva tu conexión de datos y vuelve a intentarlo")
+				.setTitle("Sin conexión de red")
+				.setPositiveButton("Volver a intentar",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// TODO Auto-generated method stub
+								comprovarconexion();
+							}
+						})
+				.setNegativeButton("Salir",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// TODO Auto-generated method
+								// stublocationManager
+								if (locationListener != null) {
+									locationManager
+											.removeUpdates(locationListener);
+								}
+								finish();
+								dialog.cancel();
+							}
+						});
+
+		AlertDialog alertDialog = dialogo3.create();
+		if (!isOnline()) {
+			alertDialog.show();
+		}
+	}
+
+	public boolean isOnline() {
+		Context context = getApplicationContext();
+		ConnectivityManager connectMgr = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (connectMgr != null) {
+			NetworkInfo[] netInfo = connectMgr.getAllNetworkInfo();
+			if (netInfo != null) {
+				for (NetworkInfo net : netInfo) {
+					if (net.getState() == NetworkInfo.State.CONNECTED) {
+						Log.d("Red", "Si");
+						return true;
+					}
+				}
+			}
+		} else {
+			Log.d("NETWORK", "No network available");
+		}
+		Log.d("Red", "No");
+		return false;
+	}
+
+	private void empezar() {
+		// TODO Auto-generated method stub
 		SharedPreferences preferences = getSharedPreferences("opciones",
 				MODE_PRIVATE);
 		if (preferences.getBoolean("habil", false)) {
@@ -71,32 +137,21 @@ public class MainActivity extends Activity {
 			@Override
 			public void onLocationChanged(Location location) {
 				// TODO Auto-generated method stub
-
 			}
 		};
 		locationManager.requestLocationUpdates(
 				LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-		ImageView ayuda = (ImageView) findViewById(R.id.boton_ayuda);
-		ayuda.setColorFilter(Color.parseColor("#84C225"));
-		ayuda.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				startActivity(new Intent(MainActivity.this, Ayuda.class));
-			}
-		});
 		RelativeLayout principal = (RelativeLayout) findViewById(R.id.principal);
 		principal.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				locationManager.removeUpdates(locationListener);
 				actualizarPosicion(location);
 
 			}
 		});
-
 	}
 
 	private void actualizarPosicion(Location location) {
@@ -121,12 +176,12 @@ public class MainActivity extends Activity {
 	public Dialog onCreateDialog(int id) {
 		// Use the Builder class for convenient dialog construction
 
-		Dialog dialog = null;
+		AlertDialog dialog = null;
 		switch (id) {
 		case 0:
 			AlertDialog.Builder dialogo0 = new AlertDialog.Builder(this);
-			dialogo0.setMessage("NO SE PUEDE ENCONTRAR LA POSICIÓN")
-					.setPositiveButton("OK",
+			dialogo0.setMessage("No se puede encontrar la posición")
+					.setPositiveButton("Ok",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
@@ -138,7 +193,7 @@ public class MainActivity extends Activity {
 			break;
 		case 1:
 			AlertDialog.Builder dialogo1 = new AlertDialog.Builder(this);
-			dialogo1.setMessage("¿QUIERES SALIR?")
+			dialogo1.setMessage("¿Quieres salir?")
 					.setPositiveButton("SÍ",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
@@ -159,8 +214,8 @@ public class MainActivity extends Activity {
 			break;
 		case 2:
 			AlertDialog.Builder dialogo2 = new AlertDialog.Builder(this);
-			dialogo2.setMessage("¿Usar Wi-Fi para obtener posición?")
-					.setTitle("SIN DATOS WI-FI")
+			dialogo2.setMessage("¿Ativar servicios de ubicaión?")
+					.setTitle("Servicios de ubicación inhabilitados")
 					.setPositiveButton("Aceptar",
 							new DialogInterface.OnClickListener() {
 
@@ -190,16 +245,43 @@ public class MainActivity extends Activity {
 							});
 			dialog = dialogo2.create();
 			break;
+		case 3:
+
+			break;
 		}
 
 		return dialog;
 	}
 
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// TODO Auto-generated method stub
+		getSupportMenuInflater().inflate(R.menu.main, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		switch (item.getItemId()) {
+		case R.id.ayuda:
+			startActivity(new Intent(MainActivity.this, Ayuda.class));
+			break;
+
+		case R.id.puntuar:
+			startActivity(new Intent(
+					Intent.ACTION_VIEW,
+					Uri.parse("https://play.google.com/store/apps/details?id=com.jldes.dondeaparque")));
+
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		showDialog(1);
-		super.onBackPressed();
 	}
 
 }

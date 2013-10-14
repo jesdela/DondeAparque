@@ -1,9 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/menu_coche" android:title="Coche" android:orderInCategory="100"></item>
-    <item android:id="@+id/menu_yo" android:title="Mi posición" android:orderInCategory="100"></item>
-    <item android:id="@+id/guardar" android:title="Guardar posición" android:orderInCategory="100"></item>
-    <item android:id="@+id/ayuda" android:title="Ayuda" android:orderInCategory="100"></item>
-    
+
+    <item
+        android:id="@+id/menu_coche"
+        android:icon="@drawable/ic_busq_coche"
+        android:showAsAction="always"
+        android:title="Coche">
+    </item>
+    <item
+        android:id="@+id/menu_yo"
+        android:icon="@android:drawable/ic_menu_mylocation"
+        android:showAsAction="always"
+        android:title="Mi posición">
+    </item>
+    <item
+        android:id="@+id/puntuar"
+        android:icon="@drawable/ic_action_name"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="Puntuar">
+    </item>
+    <item
+        android:id="@+id/ayuda"
+        android:icon="@android:drawable/ic_menu_help"
+        android:showAsAction="always"
+        android:title="Ayuda">
+    </item>
+    <item
+        android:id="@+id/guardar"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:showAsAction="always"
+        android:title="Guardar posición">
+    </item>
 
 </menu>

@@ -1,8 +1,5 @@
 package com.jldes.dondeaparque;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,16 +21,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.StrictMode;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.Window;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,39 +48,188 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-public class Mapa extends android.support.v4.app.FragmentActivity {
+public class Mapa extends SherlockFragmentActivity {
 	private GoogleMap mapa = null;
-	private LocationManager locationManager;
 	private LocationListener locationListener;
+	private MarkerOptions coche;
+	private MarkerOptions yo;
+	private LocationManager locationManager;
+	private Thread tiempo;
 	static double lat;
 	static double lon;
 	static double lat2;
 	static double lon2;
-	private String a = LocationManager.GPS_PROVIDER;
 
 	@Override
 	protected void onCreate(Bundle saveInstanceState) {
 		super.onCreate(saveInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_mapas);
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+				.permitAll().build();
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		getSupportActionBar().setIcon(
+				getResources().getDrawable(R.drawable.titulo));
+
+		getSupportActionBar().setBackgroundDrawable(
+				getResources().getDrawable(R.drawable.fondoabar));
+		StrictMode.setThreadPolicy(policy);
+		comprovarconexion();
+		empezar();
+	}
+
+	private void comprovarconexion() {
+		// TODO Auto-generated method stub
+		AlertDialog.Builder dialogo3 = new AlertDialog.Builder(this);
+		dialogo3.setMessage(
+				"Comprueva tu conexión de datos y vuelve a intentarlo")
+				.setTitle("Sin conexión de red")
+				.setPositiveButton("Volver a intentar",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// TODO Auto-generated method stub
+								comprovarconexion();
+							}
+						})
+				.setNegativeButton("Salir",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// TODO Auto-generated method
+								// stublocationManager
+								locationManager.removeUpdates(locationListener);
+								finish();
+								dialog.cancel();
+							}
+						});
+
+		AlertDialog alertDialog = dialogo3.create();
+		if (!isOnline()) {
+			alertDialog.show();
+		}
+	}
+
+	public boolean isOnline() {
+		Context context = getApplicationContext();
+		ConnectivityManager connectMgr = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (connectMgr != null) {
+			NetworkInfo[] netInfo = connectMgr.getAllNetworkInfo();
+			if (netInfo != null) {
+				for (NetworkInfo net : netInfo) {
+					if (net.getState() == NetworkInfo.State.CONNECTED) {
+						Log.d("Red", "Si");
+						return true;
+					}
+				}
+			}
+		} else {
+			Log.d("NETWORK", "No network available");
+		}
+		Log.d("Red", "No");
+		return false;
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getSupportMenuInflater().inflate(R.menu.menu, menu);
+		menu.findItem(R.id.menu_coche).getIcon()
+				.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_yo:
+			CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
+					18, 0, 0);
+			CameraUpdate camUpd2 = CameraUpdateFactory
+					.newCameraPosition(campos2);
+			mapa.animateCamera(camUpd2);
+			break;
+		case R.id.menu_coche:
+			CameraPosition camPos3 = new CameraPosition(new LatLng(lat, lon),
+					18, 0, 0);
+			mapa.animateCamera(CameraUpdateFactory.newCameraPosition(camPos3));
+			break;
+		case R.id.guardar:
+			showDialog(0);
+			break;
+		case R.id.ayuda:
+			startActivity(new Intent(Mapa.this, Ayuda.class));
+			break;
+		case R.id.puntuar:
+			startActivity(new Intent(
+					Intent.ACTION_VIEW,
+					Uri.parse("https://play.google.com/store/apps/details?id=com.jldes.dondeaparque")));
+
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		locationManager.removeUpdates(locationListener);
+		super.onDestroy();
+	}
+
+	private void empezar() {
+		// TODO Auto-generated method stub
 		SharedPreferences preferences = getSharedPreferences("opciones",
 				MODE_PRIVATE);
 		lat = preferences.getFloat("latitud", 0);
 		lon = preferences.getFloat("longitud", 0);
+		coche = new MarkerOptions()
+				.position(new LatLng(lat, lon))
+				.title("Coche")
+				.icon(BitmapDescriptorFactory
+						.fromResource(R.drawable.indicador_coche));
 		mapa = ((SupportMapFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.map)).getMap();
+		mapa.addMarker(coche);
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		Location loc = locationManager
+		final Location loc = locationManager
 				.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		actualizarposicion(loc);
+		yo = new MarkerOptions().title("Yo").icon(
+				BitmapDescriptorFactory
+						.fromResource(R.drawable.indicador_persona));
+		final Handler handler = new Handler();
+		final Runnable runnable = new Runnable() {
 
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				actualizarposicion(loc);
+			}
+		};
+		Thread tiempo = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					handler.post(runnable);
+				} catch (Exception e) {
+				}
+				// TODO: handle exception
+			}
+		};
+		tiempo.start();
 		locationListener = new LocationListener() {
-			public void onLocationChanged(Location location) {
+			public void onLocationChanged(final Location location) {
+				comprovarconexion();
 				actualizarposicion(location);
 			}
 
 			public void onProviderDisabled(String provider) {
-//				showDialog(3);
+				showDialog(3);
 			}
 
 			public void onProviderEnabled(String provider) {
@@ -89,87 +242,18 @@ public class Mapa extends android.support.v4.app.FragmentActivity {
 			}
 
 		};
-		locationManager.requestLocationUpdates(a, 0, 0, locationListener);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
-		if (item.getItemId() == R.id.menu_yo) {
-			CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
-					18, 0, 0);
-			CameraUpdate camUpd2 = CameraUpdateFactory
-					.newCameraPosition(campos2);
-			mapa.animateCamera(camUpd2);
-		} else if (item.getItemId() == R.id.menu_coche) {
-			CameraPosition camPos3 = new CameraPosition(new LatLng(lat, lon),
-					18, 0, 0);
-			mapa.animateCamera(CameraUpdateFactory.newCameraPosition(camPos3));
-		} else if (item.getItemId() == R.id.guardar) {
-			showDialog(0);
-		} else if (item.getItemId() == R.id.ayuda) {
-			startActivity(new Intent(Mapa.this, Ayuda.class));
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
-
-	// @Override
-	// public boolean onOptionsItemSelected(MenuItem item) {
-	// switch (item.getItemId()) {
-	// case R.id.menu_yo:
-	// CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
-	// 18, 0, 0);
-	// // Centramos el mapa en España y con nivel de zoom 5
-	// CameraUpdate camUpd2 = CameraUpdateFactory
-	// .newCameraPosition(campos2);
-	// mapa.animateCamera(camUpd2);
-	// break;
-	// case R.id.menu_coche:
-	// CameraPosition camPos3 = new CameraPosition(new LatLng(lat, lon),
-	// 18, 0, 0);
-	// mapa.animateCamera(CameraUpdateFactory.newCameraPosition(camPos3));
-	// break;
-	// case R.id.guardar:
-	// showDialog(0);
-	// break;
-	// case R.id.ayuda:
-	// startActivity(new Intent(Mapa.this, Ayuda.class));
-	// break;
-	// }
-	// return super.onOptionsItemSelected(item);
-	// }
-
-	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		locationManager.removeUpdates(locationListener);
-		super.onDestroy();
+		locationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 	}
 
 	private void mostrarMarcador(double lat, double lng, int i) {
 		switch (i) {
 		case 0:
-			mapa.addMarker(new MarkerOptions()
-					.position(new LatLng(lat, lng))
-					.title("Coche")
-					.icon(BitmapDescriptorFactory
-							.fromResource(R.drawable.indicador_coche)));
+			mapa.addMarker(coche);
 			break;
 
 		case 1:
-			mapa.addMarker(new MarkerOptions()
-					.position(new LatLng(lat, lng))
-					.title("Yo")
-					.icon(BitmapDescriptorFactory
-							.fromResource(R.drawable.indicador_persona)));
+			mapa.addMarker(yo);
 			break;
 		}
 	}
@@ -187,22 +271,16 @@ public class Mapa extends android.support.v4.app.FragmentActivity {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
-									try {
-										File archivo1 = new File(getFilesDir()
-												+ "/habilitado.txt");
-										archivo1.delete();
-										File archivo2 = new File(getFilesDir()
-												+ "/posicion.txt");
-										archivo2.delete();
-										locationManager
-												.removeUpdates(locationListener);
-										startActivity(new Intent(Mapa.this,
-												MainActivity.class));
-										finish();
-									} catch (Exception ex) {
-										Log.e("Ficheros",
-												"Error al escribir fichero a memoria interna");
-									}
+									SharedPreferences preferences = getSharedPreferences(
+											"opciones", MODE_PRIVATE);
+									SharedPreferences.Editor editor = preferences
+											.edit();
+									editor.putBoolean("habil", false);
+									editor.commit();
+									startActivity(new Intent(Mapa.this,
+											MainActivity.class));
+									finish();
+
 								}
 							})
 					.setNegativeButton("NO",
@@ -276,9 +354,11 @@ public class Mapa extends android.support.v4.app.FragmentActivity {
 		if (location != null) {
 			lat2 = location.getLatitude();
 			lon2 = location.getLongitude();
+			mapa.clear();
+			mapa.addMarker(coche);
+			yo.position(new LatLng(lat2, lon2));
+			mapa.addMarker(yo);
 			ruta();
-			mostrarMarcador(lat, lon, 0);
-			mostrarMarcador(lat2, lon2, 1);
 			CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
 					18, 60, location.getBearing());
 			CameraUpdate camUpd2 = CameraUpdateFactory
@@ -307,7 +387,6 @@ public class Mapa extends android.support.v4.app.FragmentActivity {
 
 	private void ruta() {
 		JSONObject json = this.rutaEntreDosPuntos();
-		mapa.clear();
 		try {
 			ArrayList<LatLng> puntosRuta = new ArrayList<LatLng>();
 			JSONArray ruta = json.getJSONArray("routes").getJSONObject(0)

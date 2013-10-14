@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jldes.dondeaparque"
-    android:versionCode="18"
-    android:versionName="7.1" >
+    android:versionCode="19"
+    android:versionName="8.1" >
 
     <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="8" />
+        android:minSdkVersion="9"
+        android:targetSdkVersion="18" />
 
     <permission
         android:name="com.jldes.mapas.permission.MAPS_RECEIVE"
@@ -26,14 +26,15 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/icono"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:logo="@drawable/titulo"
+        android:theme="@style/Theme.Sherlock"
+        android:uiOptions="splitActionBarWhenNarrow" >
         <activity
-            android:name="MainActivity"
-            android:label="@string/app_name"
+            android:name="com.jldes.dondeaparque.MainActivity"
             android:screenOrientation="portrait" >
-            <intent-filter>
+            <intent-filter> 
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -42,18 +43,11 @@
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDIN0I6qN1s2fu1EHYieOwr1RlmWVIR-Rs" />
-<!--         <meta-data -->
-<!--             android:name="com.google.android.maps.v2.API_KEY" -->
-<!--             android:value="AIzaSyCMg7x_J_15PSCpSBetkUKgUn-yC0pJEw4" /> -->
+            android:value="@string/apikey" />
 
-        <activity
-            android:name="Mapa"
-            android:label="@string/app_name" >
+        <activity android:name="com.jldes.dondeaparque.Mapa" >
         </activity>
-        <activity
-            android:name="Ayuda"
-            android:screenOrientation="portrait" >
+        <activity android:name="com.jldes.dondeaparque.Ayuda" >
         </activity>
     </application>
 
