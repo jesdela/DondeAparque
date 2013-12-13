@@ -3,6 +3,8 @@ package com.jldes.dondeaparque;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -22,6 +24,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -30,11 +34,12 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.StrictMode;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -48,13 +53,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-public class Mapa extends SherlockFragmentActivity {
+public class Mapa extends SherlockFragmentActivity implements LocationListener {
 	private GoogleMap mapa = null;
-	private LocationListener locationListener;
 	private MarkerOptions coche;
 	private MarkerOptions yo;
 	private LocationManager locationManager;
-	private Thread tiempo;
 	static double lat;
 	static double lon;
 	static double lat2;
@@ -64,15 +67,29 @@ public class Mapa extends SherlockFragmentActivity {
 	protected void onCreate(Bundle saveInstanceState) {
 		super.onCreate(saveInstanceState);
 		setContentView(R.layout.activity_mapas);
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-				.permitAll().build();
+		// StrictMode.ThreadPolicy policy = new
+		// StrictMode.ThreadPolicy.Builder()
+		// .permitAll().build();
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSupportActionBar().setIcon(
 				getResources().getDrawable(R.drawable.titulo));
 
 		getSupportActionBar().setBackgroundDrawable(
 				getResources().getDrawable(R.drawable.fondoabar));
-		StrictMode.setThreadPolicy(policy);
+		// StrictMode.setThreadPolicy(policy);
+		ImageView imageView = (ImageView) findViewById(R.id.boton_pos);
+		imageView.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				CameraPosition campos2 = new CameraPosition(new LatLng(lat2,
+						lon2), 18, 0, 0);
+				CameraUpdate camUpd2 = CameraUpdateFactory
+						.newCameraPosition(campos2);
+				mapa.animateCamera(camUpd2);
+			}
+		});
 		comprovarconexion();
 		empezar();
 	}
@@ -101,7 +118,7 @@ public class Mapa extends SherlockFragmentActivity {
 									int which) {
 								// TODO Auto-generated method
 								// stublocationManager
-								locationManager.removeUpdates(locationListener);
+								locationManager.removeUpdates(Mapa.this);
 								finish();
 								dialog.cancel();
 							}
@@ -146,12 +163,22 @@ public class Mapa extends SherlockFragmentActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_yo:
-			CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
-					18, 0, 0);
-			CameraUpdate camUpd2 = CameraUpdateFactory
-					.newCameraPosition(campos2);
-			mapa.animateCamera(camUpd2);
+		case R.id.compartir:
+			Geocoder geocoder = new Geocoder(Mapa.this, Locale.getDefault());
+			try {
+				List<Address> addresses = geocoder.getFromLocation(
+						coche.getPosition().latitude,
+						coche.getPosition().longitude, 1);
+				if (addresses.size() > 0) {
+					Social.share(this,
+							getResources().getString(R.string.app_name),
+							addresses.get(0).getAddressLine(0));
+				}
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			break;
 		case R.id.menu_coche:
 			CameraPosition camPos3 = new CameraPosition(new LatLng(lat, lon),
@@ -177,7 +204,7 @@ public class Mapa extends SherlockFragmentActivity {
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
-		locationManager.removeUpdates(locationListener);
+		locationManager.removeUpdates(this);
 		super.onDestroy();
 	}
 
@@ -196,6 +223,8 @@ public class Mapa extends SherlockFragmentActivity {
 				.findFragmentById(R.id.map)).getMap();
 		mapa.addMarker(coche);
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		locationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 0, 0, this);
 		final Location loc = locationManager
 				.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		yo = new MarkerOptions().title("Yo").icon(
@@ -222,28 +251,6 @@ public class Mapa extends SherlockFragmentActivity {
 			}
 		};
 		tiempo.start();
-		locationListener = new LocationListener() {
-			public void onLocationChanged(final Location location) {
-				comprovarconexion();
-				actualizarposicion(location);
-			}
-
-			public void onProviderDisabled(String provider) {
-				showDialog(3);
-			}
-
-			public void onProviderEnabled(String provider) {
-
-			}
-
-			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
-
-			}
-
-		};
-		locationManager.requestLocationUpdates(
-				LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 	}
 
 	private void mostrarMarcador(double lat, double lng, int i) {
@@ -299,8 +306,7 @@ public class Mapa extends SherlockFragmentActivity {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
-									locationManager
-											.removeUpdates(locationListener);
+									locationManager.removeUpdates(Mapa.this);
 									finish();
 								}
 							})
@@ -358,7 +364,7 @@ public class Mapa extends SherlockFragmentActivity {
 			mapa.addMarker(coche);
 			yo.position(new LatLng(lat2, lon2));
 			mapa.addMarker(yo);
-			ruta();
+			// ruta();
 			CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
 					18, 60, location.getBearing());
 			CameraUpdate camUpd2 = CameraUpdateFactory
@@ -494,6 +500,31 @@ public class Mapa extends SherlockFragmentActivity {
 			e.printStackTrace();
 		}
 		return json;
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		// TODO Auto-generated method stub
+		comprovarconexion();
+		actualizarposicion(location);
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// TODO Auto-generated method stub
+		showDialog(3);
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

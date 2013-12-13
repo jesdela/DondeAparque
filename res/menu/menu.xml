@@ -8,29 +8,28 @@
         android:title="Coche">
     </item>
     <item
-        android:id="@+id/menu_yo"
-        android:icon="@android:drawable/ic_menu_mylocation"
-        android:showAsAction="always"
-        android:title="Mi posición">
-    </item>
-    <item
-        android:id="@+id/puntuar"
-        android:icon="@drawable/ic_action_name"
-        android:orderInCategory="100"
-        android:showAsAction="always"
-        android:title="Puntuar">
-    </item>
-    <item
         android:id="@+id/ayuda"
         android:icon="@android:drawable/ic_menu_help"
-        android:showAsAction="always"
+        android:showAsAction="collapseActionView"
         android:title="Ayuda">
     </item>
     <item
         android:id="@+id/guardar"
-        android:icon="@android:drawable/ic_menu_delete"
+        android:icon="@android:drawable/ic_menu_save"
         android:showAsAction="always"
         android:title="Guardar posición">
+    </item>
+    <item
+        android:id="@+id/puntuar"
+        android:icon="@drawable/ic_action_name"
+        android:showAsAction="always"
+        android:title="Puntuar">
+    </item>
+    <item
+        android:id="@+id/compartir"
+        android:icon="@android:drawable/ic_menu_share"
+        android:showAsAction="always"
+        android:title="Compartir">
     </item>
 
 </menu>
