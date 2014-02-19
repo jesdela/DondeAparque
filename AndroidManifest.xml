@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jldes.dondeaparque"
-    android:versionCode="20"
-    android:versionName="8.3" >
+    android:versionCode="22"
+    android:versionName="8.3.2" >
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -31,9 +31,10 @@
         android:theme="@style/Theme.Sherlock" >
         <activity
             android:name="com.jldes.dondeaparque.MainActivity"
-            android:screenOrientation="portrait" 
-        android:uiOptions="splitActionBarWhenNarrow">
-            <intent-filter> 
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:screenOrientation="portrait"
+            android:uiOptions="splitActionBarWhenNarrow" >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -44,8 +45,13 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/apikey_apk" />
 
-        <activity android:name="com.jldes.dondeaparque.Mapa" 
-        android:uiOptions="splitActionBarWhenNarrow">
+        <activity
+            android:name="com.jldes.dondeaparque.Mapa"
+            android:uiOptions="splitActionBarWhenNarrow" >
+        </activity>
+        <activity
+            android:name="com.tappx.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" >
         </activity>
         <activity android:name="com.jldes.dondeaparque.Ayuda" >
         </activity>

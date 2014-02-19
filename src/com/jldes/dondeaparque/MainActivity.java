@@ -23,11 +23,14 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.tappx.ads.exchange.TAPPXAdView;
+import com.tappx.ads.exchange.TAPPXInterstitialAd;
 
-public class MainActivity extends SherlockActivity {
+public class MainActivity extends SherlockActivity implements LocationListener {
 	private LocationManager locationManager;
-	private LocationListener locationListener;
 	private Thread tiempo;
+	private final String TAPPX_KEY = "/120940746/Pub-1089-Android-7011";
+	private TAPPXInterstitialAd mBanner = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,9 @@ public class MainActivity extends SherlockActivity {
 		getSupportActionBar().setIcon(
 				getResources().getDrawable(R.drawable.titulo));
 		setContentView(R.layout.activity_main);
+		mBanner = com.tappx.ads.exchange.Utils.InterstitialConfigureAndShow(
+				this, TAPPX_KEY);
+
 		comprovarconexion();
 		empezar();
 	}
@@ -66,10 +72,8 @@ public class MainActivity extends SherlockActivity {
 									int which) {
 								// TODO Auto-generated method
 								// stublocationManager
-								if (locationListener != null) {
-									locationManager
-											.removeUpdates(locationListener);
-								}
+								locationManager
+										.removeUpdates(MainActivity.this);
 								finish();
 								dialog.cancel();
 							}
@@ -111,43 +115,18 @@ public class MainActivity extends SherlockActivity {
 			finish();
 		}
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		locationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 0, 0, this);
 		final Location location = locationManager
 				.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		locationListener = new LocationListener() {
 
-			@Override
-			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onProviderEnabled(String provider) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onProviderDisabled(String provider) {
-				// TODO Auto-generated method stub
-				showDialog(2);
-			}
-
-			@Override
-			public void onLocationChanged(Location location) {
-				// TODO Auto-generated method stub
-			}
-		};
-		locationManager.requestLocationUpdates(
-				LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 		RelativeLayout principal = (RelativeLayout) findViewById(R.id.principal);
 		principal.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				locationManager.removeUpdates(locationListener);
+				locationManager.removeUpdates(MainActivity.this);
 				actualizarPosicion(location);
 
 			}
@@ -164,7 +143,7 @@ public class MainActivity extends SherlockActivity {
 			editor.putFloat("latitud", (float) location.getLatitude());
 			editor.putFloat("longitud", (float) location.getLongitude());
 			editor.commit();
-			locationManager.removeUpdates(locationListener);
+			locationManager.removeUpdates(this);
 			startActivity(new Intent(MainActivity.this, Mapa.class));
 			finish();
 		} else {
@@ -199,7 +178,7 @@ public class MainActivity extends SherlockActivity {
 								public void onClick(DialogInterface dialog,
 										int id) {
 									locationManager
-											.removeUpdates(locationListener);
+											.removeUpdates(MainActivity.this);
 									finish();
 								}
 							})
@@ -238,7 +217,7 @@ public class MainActivity extends SherlockActivity {
 									// TODO Auto-generated method
 									// stublocationManager
 									locationManager
-											.removeUpdates(locationListener);
+											.removeUpdates(MainActivity.this);
 									finish();
 									dialog.cancel();
 								}
@@ -278,10 +257,43 @@ public class MainActivity extends SherlockActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+//	@Override
+//	protected void onDestroy() {
+//		// TODO Auto-generated method stub
+//		super.onDestroy();
+//		if (mBanner != null) {
+//			mBanner.destroy();
+//		}
+//	}
+
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		showDialog(1);
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// TODO Auto-generated method stub
+		showDialog(2);
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
