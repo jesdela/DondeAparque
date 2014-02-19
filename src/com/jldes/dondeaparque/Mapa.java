@@ -47,10 +47,12 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -59,6 +61,7 @@ public class Mapa extends SherlockFragmentActivity implements LocationListener {
 	private MarkerOptions coche;
 	private MarkerOptions yo;
 	private LocationManager locationManager;
+	private boolean condition=true;
 	static double lat;
 	static double lon;
 	static double lat2;
@@ -182,7 +185,7 @@ public class Mapa extends SherlockFragmentActivity implements LocationListener {
 			}
 			break;
 		case R.id.menu_coche:
-			CameraPosition camPos3 = new CameraPosition(new LatLng(lat, lon),
+			CameraPosition camPos3 = new CameraPosition(coche.getPosition(),
 					18, 0, 0);
 			mapa.animateCamera(CameraUpdateFactory.newCameraPosition(camPos3));
 			break;
@@ -217,12 +220,51 @@ public class Mapa extends SherlockFragmentActivity implements LocationListener {
 		lon = preferences.getFloat("longitud", 0);
 		coche = new MarkerOptions()
 				.position(new LatLng(lat, lon))
+				.draggable(true)
 				.title("Coche")
 				.icon(BitmapDescriptorFactory
 						.fromResource(R.drawable.indicador_coche));
 		mapa = ((SupportMapFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.map)).getMap();
-		mapa.addMarker(coche);
+		Marker marcador_coche = mapa.addMarker(coche);
+		mapa.setOnMarkerDragListener(new OnMarkerDragListener() {
+
+			@Override
+			public void onMarkerDragStart(Marker marcador) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onMarkerDragEnd(Marker marcador) {
+				// TODO Auto-generated method stub
+				coche.position(marcador.getPosition());
+				SharedPreferences preferences = getSharedPreferences(
+						"opciones", MODE_PRIVATE);
+				SharedPreferences.Editor editor = preferences.edit();
+				editor.putBoolean("habil", true);
+				editor.putFloat("latitud",
+						(float) marcador.getPosition().latitude);
+				editor.putFloat("longitud",
+						(float) marcador.getPosition().longitude);
+				editor.commit();
+			}
+
+			@Override
+			public void onMarkerDrag(Marker marcador) {
+				// TODO Auto-generated method stub
+				coche.position(marcador.getPosition());
+				SharedPreferences preferences = getSharedPreferences(
+						"opciones", MODE_PRIVATE);
+				SharedPreferences.Editor editor = preferences.edit();
+				editor.putBoolean("habil", true);
+				editor.putFloat("latitud",
+						(float) marcador.getPosition().latitude);
+				editor.putFloat("longitud",
+						(float) marcador.getPosition().longitude);
+				editor.commit();
+			}
+		});
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(
 				LocationManager.NETWORK_PROVIDER, 0, 0, this);
@@ -366,11 +408,14 @@ public class Mapa extends SherlockFragmentActivity implements LocationListener {
 			yo.position(new LatLng(lat2, lon2));
 			mapa.addMarker(yo);
 			// ruta();
-			CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
-					18, 60, location.getBearing());
-			CameraUpdate camUpd2 = CameraUpdateFactory
-					.newCameraPosition(campos2);
-			mapa.animateCamera(camUpd2);
+			if (condition) {
+				condition=!condition;
+				CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
+						18, 60, location.getBearing());
+				CameraUpdate camUpd2 = CameraUpdateFactory
+						.newCameraPosition(campos2);
+				mapa.animateCamera(camUpd2);
+			}
 
 		} else {
 			showDialog(2);
