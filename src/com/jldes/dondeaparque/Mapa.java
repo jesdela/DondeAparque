@@ -35,14 +35,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -56,7 +57,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-public class Mapa extends SherlockFragmentActivity implements LocationListener {
+public class Mapa extends ActionBarActivity implements LocationListener {
 	private GoogleMap mapa = null;
 	private MarkerOptions coche;
 	private MarkerOptions yo;
@@ -158,7 +159,7 @@ public class Mapa extends SherlockFragmentActivity implements LocationListener {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getSupportMenuInflater().inflate(R.menu.menu, menu);
+		getMenuInflater().inflate(R.menu.menu, menu);
 		menu.findItem(R.id.menu_coche).getIcon()
 				.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
 		return super.onCreateOptionsMenu(menu);

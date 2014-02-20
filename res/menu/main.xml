@@ -5,15 +5,13 @@
         android:id="@+id/ayuda"
         android:icon="@android:drawable/ic_menu_help"
         android:orderInCategory="100"
-        android:showAsAction="always"
-        android:title="Ayuda">
+        jldes:showAsAction="always">
     </item>
     <item
         android:id="@+id/puntuar"
         android:icon="@drawable/ic_action_name"
         android:orderInCategory="100"
-        android:showAsAction="always"
-        android:title="Puntuar">
+        jldes:showAsAction="always">
     </item>
 
 </menu>

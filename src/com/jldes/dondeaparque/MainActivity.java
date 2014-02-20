@@ -14,23 +14,18 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
-
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.tappx.ads.exchange.TAPPXAdView;
-import com.tappx.ads.exchange.TAPPXInterstitialAd;
-
-public class MainActivity extends SherlockActivity implements LocationListener {
+import com.google.ads.*;
+public class MainActivity extends ActionBarActivity implements LocationListener {
 	private LocationManager locationManager;
-	private Thread tiempo;
+	private AdView adView;
 	private final String TAPPX_KEY = "/120940746/Pub-1089-Android-7011";
-	private TAPPXInterstitialAd mBanner = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +36,31 @@ public class MainActivity extends SherlockActivity implements LocationListener {
 		getSupportActionBar().setIcon(
 				getResources().getDrawable(R.drawable.titulo));
 		setContentView(R.layout.activity_main);
-		mBanner = com.tappx.ads.exchange.Utils.InterstitialConfigureAndShow(
+		adView = new AdView(this, AdSize.SMART_BANNER, "ca-app-pub-9595013952750962/5592859939");
+//		adView.setAdUnitId("ca-app-pub-9595013952750962/5592859939");
+//		adView.setAdSize(AdSize.SMART_BANNER);
+		com.tappx.ads.exchange.Utils.InterstitialConfigureAndShow(
 				this, TAPPX_KEY);
-
+		RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.principal);
+		relativeLayout.addView(adView);
+		AdRequest adRequest = new AdRequest().addTestDevice("609C2C46CA7191C8618A1BCD374207EAD4211DA8");
+		adView.loadAd(adRequest);
 		comprovarconexion();
 		empezar();
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+//		adView.pause();
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+//		adView.resume();
+		super.onResume();
 	}
 
 	private void comprovarconexion() {
@@ -235,7 +250,7 @@ public class MainActivity extends SherlockActivity implements LocationListener {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// TODO Auto-generated method stub
-		getSupportMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.main, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -257,14 +272,13 @@ public class MainActivity extends SherlockActivity implements LocationListener {
 		return super.onOptionsItemSelected(item);
 	}
 
-//	@Override
-//	protected void onDestroy() {
-//		// TODO Auto-generated method stub
-//		super.onDestroy();
-//		if (mBanner != null) {
-//			mBanner.destroy();
-//		}
-//	}
+	 @Override
+	 protected void onDestroy() {
+	 // TODO Auto-generated method stub
+//		 adView.destroy();
+	 super.onDestroy();
+	
+	 }
 
 	@Override
 	public void onBackPressed() {

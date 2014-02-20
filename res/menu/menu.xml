@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:jldes="http://schemas.android.com/apk/res-auto" >
 
     <item
         android:id="@+id/menu_coche"
         android:icon="@drawable/ic_busq_coche"
-        android:showAsAction="always"
-        android:title="Coche">
+        android:title="Coche"
+        jldes:showAsAction="always">
     </item>
     <item
         android:id="@+id/ayuda"
         android:icon="@android:drawable/ic_menu_help"
-        android:showAsAction="collapseActionView"
-        android:title="Ayuda">
+        android:title="Ayuda"
+        jldes:showAsAction="collapseActionView">
     </item>
     <item
         android:id="@+id/guardar"
         android:icon="@android:drawable/ic_menu_save"
-        android:showAsAction="always"
-        android:title="Guardar posición">
+        android:title="Guardar posición"
+        jldes:showAsAction="always">
     </item>
     <item
         android:id="@+id/puntuar"
         android:icon="@drawable/ic_action_name"
-        android:showAsAction="always"
-        android:title="Puntuar">
+        android:title="Puntuar"
+        jldes:showAsAction="always">
     </item>
     <item
         android:id="@+id/compartir"
         android:icon="@android:drawable/ic_menu_share"
-        android:showAsAction="always"
-        android:title="Compartir">
+        android:title="Compartir"
+        jldes:showAsAction="always">
     </item>
 
 </menu>
