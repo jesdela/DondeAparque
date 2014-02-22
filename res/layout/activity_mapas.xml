@@ -7,7 +7,9 @@
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/rela"
         class="com.google.android.gms.maps.SupportMapFragment" />
+
     <ImageButton
         android:id="@+id/boton_pos"
         android:layout_width="wrap_content"
@@ -18,5 +20,13 @@
         android:alpha="0.9"
         android:background="@android:drawable/btn_default_small"
         android:src="@drawable/ic_localizacion" />
+
+    <RelativeLayout
+        android:id="@+id/rela"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" >
+    </RelativeLayout>
 
 </RelativeLayout>

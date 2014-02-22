@@ -43,7 +43,7 @@
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="@string/apikey_apk" />
+            android:value="@string/apikey" />
 
         <activity
             android:name="com.jldes.dondeaparque.Mapa"

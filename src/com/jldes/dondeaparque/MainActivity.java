@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
 import com.google.ads.*;
+
 public class MainActivity extends ActionBarActivity implements LocationListener {
 	private LocationManager locationManager;
 	private AdView adView;
@@ -36,14 +37,16 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 		getSupportActionBar().setIcon(
 				getResources().getDrawable(R.drawable.titulo));
 		setContentView(R.layout.activity_main);
-		adView = new AdView(this, AdSize.SMART_BANNER, "ca-app-pub-9595013952750962/5592859939");
-//		adView.setAdUnitId("ca-app-pub-9595013952750962/5592859939");
-//		adView.setAdSize(AdSize.SMART_BANNER);
-		com.tappx.ads.exchange.Utils.InterstitialConfigureAndShow(
-				this, TAPPX_KEY);
+		adView = new AdView(this, AdSize.SMART_BANNER,
+				"ca-app-pub-9595013952750962/5592859939");
+		// adView.setAdUnitId("ca-app-pub-9595013952750962/5592859939");
+		// adView.setAdSize(AdSize.SMART_BANNER);
+		com.tappx.ads.exchange.Utils.InterstitialConfigureAndShow(this,
+				TAPPX_KEY);
 		RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.principal);
 		relativeLayout.addView(adView);
-		AdRequest adRequest = new AdRequest().addTestDevice("609C2C46CA7191C8618A1BCD374207EAD4211DA8");
+		AdRequest adRequest = new AdRequest()
+				.addTestDevice("609C2C46CA7191C8618A1BCD374207EAD4211DA8");
 		adView.loadAd(adRequest);
 		comprovarconexion();
 		empezar();
@@ -52,14 +55,14 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
-//		adView.pause();
+		// adView.pause();
 		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
-//		adView.resume();
+		// adView.resume();
 		super.onResume();
 	}
 
@@ -272,13 +275,16 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 		return super.onOptionsItemSelected(item);
 	}
 
-	 @Override
-	 protected void onDestroy() {
-	 // TODO Auto-generated method stub
-//		 adView.destroy();
-	 super.onDestroy();
-	
-	 }
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		// adView.destroy();
+		if (adView != null) {
+			adView.destroy();
+		}
+		super.onDestroy();
+
+	}
 
 	@Override
 	public void onBackPressed() {

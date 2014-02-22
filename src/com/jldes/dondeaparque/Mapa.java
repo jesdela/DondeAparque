@@ -43,7 +43,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -62,11 +67,12 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 	private MarkerOptions coche;
 	private MarkerOptions yo;
 	private LocationManager locationManager;
-	private boolean condition=true;
+	private boolean condition = true;
 	static double lat;
 	static double lon;
 	static double lat2;
 	static double lon2;
+	private AdView adView;
 
 	@Override
 	protected void onCreate(Bundle saveInstanceState) {
@@ -82,6 +88,13 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 		getSupportActionBar().setBackgroundDrawable(
 				getResources().getDrawable(R.drawable.fondoabar));
 		// StrictMode.setThreadPolicy(policy);
+		adView = new AdView(this, AdSize.SMART_BANNER,
+				"ca-app-pub-9595013952750962/5592859939");
+		RelativeLayout linearLayout = (RelativeLayout) findViewById(R.id.rela);
+		linearLayout.addView(adView);
+		AdRequest adRequest = new AdRequest()
+				.addTestDevice("609C2C46CA7191C8618A1BCD374207EAD4211DA8");
+		adView.loadAd(adRequest);
 		ImageView imageView = (ImageView) findViewById(R.id.boton_pos);
 		imageView.setOnClickListener(new OnClickListener() {
 
@@ -209,6 +222,9 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
+		if (adView != null) {
+			adView.destroy();
+		}
 		locationManager.removeUpdates(this);
 		super.onDestroy();
 	}
@@ -410,9 +426,9 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 			mapa.addMarker(yo);
 			// ruta();
 			if (condition) {
-				condition=!condition;
-				CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
-						18, 60, location.getBearing());
+				condition = !condition;
+				CameraPosition campos2 = new CameraPosition(new LatLng(lat2,
+						lon2), 18, 60, location.getBearing());
 				CameraUpdate camUpd2 = CameraUpdateFactory
 						.newCameraPosition(campos2);
 				mapa.animateCamera(camUpd2);
