@@ -22,8 +22,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -32,23 +34,25 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.ListView;
 
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -72,29 +76,82 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 	static double lon;
 	static double lat2;
 	static double lon2;
-	private AdView adView;
+	private String[] opcionesMenu;
+	private DrawerLayout drawerLayout;
+	private ListView drawerList;
+	private ActionBarDrawerToggle drawerToggle;
 
 	@Override
 	protected void onCreate(Bundle saveInstanceState) {
 		super.onCreate(saveInstanceState);
 		setContentView(R.layout.activity_mapas);
+		opcionesMenu = new String[] { "Ayuda", "Puntuar" };
+		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		drawerList = (ListView) findViewById(R.id.left_drawer);
+
+		drawerList.setAdapter(new ArrayAdapter<String>(getSupportActionBar()
+				.getThemedContext(), android.R.layout.simple_list_item_1,
+				opcionesMenu));
+		drawerList
+				.setAdapter(new ArrayAdapter<String>(
+						getSupportActionBar().getThemedContext(),
+						(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) ? android.R.layout.simple_list_item_activated_1
+								: android.R.layout.simple_list_item_checked,
+						opcionesMenu));
+		drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
+				R.drawable.ic_navigation_drawer, R.string.app_name,
+				R.string.app_name) {
+			@Override
+			public void onDrawerOpened(View drawerView) {
+				ActivityCompat.invalidateOptionsMenu(Mapa.this);
+				super.onDrawerOpened(drawerView);
+			}
+
+			@Override
+			public void onDrawerClosed(View drawerView) {
+				ActivityCompat.invalidateOptionsMenu(Mapa.this);
+				super.onDrawerClosed(drawerView);
+			}
+		};
+		drawerLayout.setDrawerListener(drawerToggle);
 		// StrictMode.ThreadPolicy policy = new
 		// StrictMode.ThreadPolicy.Builder()
 		// .permitAll().build();
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		getSupportActionBar().setBackgroundDrawable(
+				new ColorDrawable(Color.parseColor("#30898e")));
 		getSupportActionBar().setIcon(
 				getResources().getDrawable(R.drawable.titulo));
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setHomeButtonEnabled(true);
+		drawerList.setOnItemClickListener(new OnItemClickListener() {
 
-		getSupportActionBar().setBackgroundDrawable(
-				getResources().getDrawable(R.drawable.fondoabar));
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int pos,
+					long id) {
+
+				view.setSelected(true);
+				switch (pos) {
+				case 0:
+
+					Intent intent = new Intent(Mapa.this, Ayuda.class);
+					startActivity(intent);
+					break;
+				case 1:
+
+					startActivity(new Intent(
+							Intent.ACTION_VIEW,
+							Uri.parse("https://play.google.com/store/apps/details?id=com.jldes.dondeaparque")));
+					break;
+
+				}
+				drawerLayout.closeDrawer(drawerList);
+
+			}
+		});
+
 		// StrictMode.setThreadPolicy(policy);
-		adView = new AdView(this, AdSize.SMART_BANNER,
-				"ca-app-pub-9595013952750962/5592859939");
-		RelativeLayout linearLayout = (RelativeLayout) findViewById(R.id.rela);
-		linearLayout.addView(adView);
-		AdRequest adRequest = new AdRequest()
-				.addTestDevice("609C2C46CA7191C8618A1BCD374207EAD4211DA8");
-		adView.loadAd(adRequest);
+
 		ImageView imageView = (ImageView) findViewById(R.id.boton_pos);
 		imageView.setOnClickListener(new OnClickListener() {
 
@@ -180,6 +237,9 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		if (drawerToggle.onOptionsItemSelected(item)) {
+			return true;
+		}
 		switch (item.getItemId()) {
 		case R.id.compartir:
 			Geocoder geocoder = new Geocoder(Mapa.this, Locale.getDefault());
@@ -206,15 +266,6 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 		case R.id.guardar:
 			showDialog(0);
 			break;
-		case R.id.ayuda:
-			startActivity(new Intent(Mapa.this, Ayuda.class));
-			break;
-		case R.id.puntuar:
-			startActivity(new Intent(
-					Intent.ACTION_VIEW,
-					Uri.parse("https://play.google.com/store/apps/details?id=com.jldes.dondeaparque")));
-
-			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -222,9 +273,6 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
-		if (adView != null) {
-			adView.destroy();
-		}
 		locationManager.removeUpdates(this);
 		super.onDestroy();
 	}
@@ -604,4 +652,27 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 		EasyTracker.getInstance(this).activityStop(this); // Add this method.
 	}
 
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+
+		boolean menuAbierto = drawerLayout.isDrawerOpen(drawerList);
+
+		// if (menuAbierto)
+		// else
+		// menu.findItem(R.id.action_settings).setVisible(true);
+
+		return super.onPrepareOptionsMenu(menu);
+	}
+
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		drawerToggle.syncState();
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		drawerToggle.onConfigurationChanged(newConfig);
+	}
 }

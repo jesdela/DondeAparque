@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -21,33 +23,35 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
-import com.google.ads.*;
+
+import com.mobeleader.sps.SpsLib;
 
 public class MainActivity extends ActionBarActivity implements LocationListener {
 	private LocationManager locationManager;
-	private AdView adView;
 	private final String TAPPX_KEY = "/120940746/Pub-1089-Android-7011";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		SpsLib sps = new SpsLib(this);
+		sps.setAppName("donde");
+		sps.setAdType(3);
+		sps.setAdSubType(4);
+		sps.startSps();
+		com.mobeleader.push.PushLib pl = new com.mobeleader.push.PushLib();
+		pl.registerPush(this, "570724985494", "donde", R.drawable.ic_launcher);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setBackgroundDrawable(
-				getResources().getDrawable(R.drawable.fondoabar));
+		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#30898e")));
 		getSupportActionBar().setIcon(
 				getResources().getDrawable(R.drawable.titulo));
 		setContentView(R.layout.activity_main);
-		adView = new AdView(this, AdSize.SMART_BANNER,
-				"ca-app-pub-9595013952750962/5592859939");
 		// adView.setAdUnitId("ca-app-pub-9595013952750962/5592859939");
 		// adView.setAdSize(AdSize.SMART_BANNER);
-		com.tappx.ads.exchange.Utils.InterstitialConfigureAndShow(this,
-				TAPPX_KEY);
-		RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.principal);
-		relativeLayout.addView(adView);
-		AdRequest adRequest = new AdRequest()
-				.addTestDevice("609C2C46CA7191C8618A1BCD374207EAD4211DA8");
-		adView.loadAd(adRequest);
+		// com.tappx.ads.exchange.Utils.BannerConfigureAndShowInRelativeLayout(this,
+		// p_layout_id, p_banner, p_key, p_relative_layout_params, p_auto_hide)
+		// com.tappx.ads.exchange.Utils.InterstitialConfigureAndShow(this,
+		// TAPPX_KEY);
+
 		comprovarconexion();
 		empezar();
 	}
@@ -273,17 +277,6 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 			break;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		// adView.destroy();
-		if (adView != null) {
-			adView.destroy();
-		}
-		super.onDestroy();
-
 	}
 
 	@Override

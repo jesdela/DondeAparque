@@ -1,5 +1,7 @@
 package com.jldes.dondeaparque;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
@@ -11,8 +13,7 @@ public class Ayuda extends ActionBarActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_ayuda);
-		getSupportActionBar().setBackgroundDrawable(
-				getResources().getDrawable(R.drawable.fondoabar));
+		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#30898e")));
 		getSupportActionBar().setIcon(
 				getResources().getDrawable(R.drawable.titulo));
 		getSupportActionBar().setDisplayShowTitleEnabled(false);

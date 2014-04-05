@@ -9,21 +9,9 @@
         jldes:showAsAction="always">
     </item>
     <item
-        android:id="@+id/ayuda"
-        android:icon="@android:drawable/ic_menu_help"
-        android:title="Ayuda"
-        jldes:showAsAction="collapseActionView">
-    </item>
-    <item
         android:id="@+id/guardar"
         android:icon="@android:drawable/ic_menu_save"
         android:title="Guardar posición"
-        jldes:showAsAction="always">
-    </item>
-    <item
-        android:id="@+id/puntuar"
-        android:icon="@drawable/ic_action_name"
-        android:title="Puntuar"
         jldes:showAsAction="always">
     </item>
     <item
