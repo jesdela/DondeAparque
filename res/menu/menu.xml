@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:jldes="http://schemas.android.com/apk/res-auto" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
         android:id="@+id/menu_coche"
         android:icon="@drawable/ic_busq_coche"
         android:title="Coche"
-        jldes:showAsAction="always">
+        android:showAsAction="always">
     </item>
     <item
         android:id="@+id/guardar"
         android:icon="@android:drawable/ic_menu_save"
         android:title="Guardar posición"
-        jldes:showAsAction="always">
+        android:showAsAction="always">
     </item>
     <item
         android:id="@+id/compartir"
         android:icon="@android:drawable/ic_menu_share"
         android:title="Compartir"
-        jldes:showAsAction="always">
+        android:showAsAction="always">
     </item>
 
 </menu>

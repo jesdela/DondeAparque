@@ -1,5 +1,6 @@
 package com.jldes.dondeaparque;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -16,7 +17,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,25 +24,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
 
-import com.mobeleader.sps.SpsLib;
-
-public class MainActivity extends ActionBarActivity implements LocationListener {
+public class MainActivity extends Activity implements LocationListener {
 	private LocationManager locationManager;
-	private final String TAPPX_KEY = "/120940746/Pub-1089-Android-7011";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		SpsLib sps = new SpsLib(this);
-		sps.setAppName("donde");
-		sps.setAdType(3);
-		sps.setAdSubType(4);
-		sps.startSps();
-		com.mobeleader.push.PushLib pl = new com.mobeleader.push.PushLib();
-		pl.registerPush(this, "570724985494", "donde", R.drawable.ic_launcher);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#30898e")));
-		getSupportActionBar().setIcon(
+		getActionBar().setDisplayShowTitleEnabled(false);
+		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#30898e")));
+		getActionBar().setIcon(
 				getResources().getDrawable(R.drawable.titulo));
 		setContentView(R.layout.activity_main);
 		// adView.setAdUnitId("ca-app-pub-9595013952750962/5592859939");

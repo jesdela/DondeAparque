@@ -34,14 +34,12 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -66,7 +64,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-public class Mapa extends ActionBarActivity implements LocationListener {
+public class Mapa extends android.support.v4.app.FragmentActivity implements
+		LocationListener {
 	private GoogleMap mapa = null;
 	private MarkerOptions coche;
 	private MarkerOptions yo;
@@ -76,56 +75,48 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 	static double lon;
 	static double lat2;
 	static double lon2;
-	private String[] opcionesMenu;
 	private DrawerLayout drawerLayout;
-	private ListView drawerList;
+	ListView navListView;
+	private String[] opcionesMenu;
 	private ActionBarDrawerToggle drawerToggle;
 
 	@Override
 	protected void onCreate(Bundle saveInstanceState) {
 		super.onCreate(saveInstanceState);
 		setContentView(R.layout.activity_mapas);
-		opcionesMenu = new String[] { "Ayuda", "Puntuar" };
-		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		drawerList = (ListView) findViewById(R.id.left_drawer);
-
-		drawerList.setAdapter(new ArrayAdapter<String>(getSupportActionBar()
-				.getThemedContext(), android.R.layout.simple_list_item_1,
-				opcionesMenu));
-		drawerList
-				.setAdapter(new ArrayAdapter<String>(
-						getSupportActionBar().getThemedContext(),
-						(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) ? android.R.layout.simple_list_item_activated_1
-								: android.R.layout.simple_list_item_checked,
-						opcionesMenu));
-		drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
-				R.drawable.ic_navigation_drawer, R.string.app_name,
-				R.string.app_name) {
-			@Override
-			public void onDrawerOpened(View drawerView) {
-				ActivityCompat.invalidateOptionsMenu(Mapa.this);
-				super.onDrawerOpened(drawerView);
-			}
-
-			@Override
-			public void onDrawerClosed(View drawerView) {
-				ActivityCompat.invalidateOptionsMenu(Mapa.this);
-				super.onDrawerClosed(drawerView);
-			}
-		};
-		drawerLayout.setDrawerListener(drawerToggle);
 		// StrictMode.ThreadPolicy policy = new
 		// StrictMode.ThreadPolicy.Builder()
 		// .permitAll().build();
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setBackgroundDrawable(
-				new ColorDrawable(Color.parseColor("#30898e")));
-		getSupportActionBar().setIcon(
-				getResources().getDrawable(R.drawable.titulo));
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setHomeButtonEnabled(true);
-		drawerList.setOnItemClickListener(new OnItemClickListener() {
+		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
+		navListView = (ListView) findViewById(R.id.left_drawer);
+		opcionesMenu = new String[] { "Ayuda", "Puntuar" };
+		navListView.setAdapter(new ArrayAdapter<String>(getActionBar()
+				.getThemedContext(), android.R.layout.simple_list_item_1,
+				opcionesMenu));
+		drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
+				R.drawable.ic_navigation_drawer, R.string.app_name,
+				R.string.app_name) {
+
+			public void onDrawerClosed(View view) {
+				ActivityCompat.invalidateOptionsMenu(Mapa.this);
+			}
+
+			public void onDrawerOpened(View drawerView) {
+				ActivityCompat.invalidateOptionsMenu(Mapa.this);
+			}
+		};
+
+		drawerLayout.setDrawerListener(drawerToggle);
+		getActionBar().setDisplayShowTitleEnabled(false);
+		getActionBar().setBackgroundDrawable(
+				new ColorDrawable(Color.parseColor("#30898e")));
+		getActionBar().setIcon(
+				getResources().getDrawable(R.drawable.titulo));
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
+
+		navListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int pos,
 					long id) {
@@ -145,13 +136,11 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 					break;
 
 				}
-				drawerLayout.closeDrawer(drawerList);
+				drawerLayout.closeDrawer(navListView);
 
 			}
 		});
-
 		// StrictMode.setThreadPolicy(policy);
-
 		ImageView imageView = (ImageView) findViewById(R.id.boton_pos);
 		imageView.setOnClickListener(new OnClickListener() {
 
@@ -265,6 +254,15 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 			break;
 		case R.id.guardar:
 			showDialog(0);
+			break;
+		case R.id.ayuda:
+			startActivity(new Intent(Mapa.this, Ayuda.class));
+			break;
+		case R.id.puntuar:
+			startActivity(new Intent(
+					Intent.ACTION_VIEW,
+					Uri.parse("https://play.google.com/store/apps/details?id=com.jldes.dondeaparque")));
+
 			break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -655,7 +653,7 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 
-		boolean menuAbierto = drawerLayout.isDrawerOpen(drawerList);
+		boolean menuAbierto = drawerLayout.isDrawerOpen(navListView);
 
 		// if (menuAbierto)
 		// else
