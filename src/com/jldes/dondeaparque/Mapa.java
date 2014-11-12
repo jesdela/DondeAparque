@@ -22,8 +22,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -35,14 +37,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.maps.CameraUpdate;
@@ -57,16 +64,21 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-public class Mapa extends ActionBarActivity implements LocationListener {
+public class Mapa extends android.support.v4.app.FragmentActivity implements
+		LocationListener {
 	private GoogleMap mapa = null;
 	private MarkerOptions coche;
 	private MarkerOptions yo;
 	private LocationManager locationManager;
-	private boolean condition=true;
+	private boolean condition = true;
 	static double lat;
 	static double lon;
 	static double lat2;
 	static double lon2;
+	private DrawerLayout drawerLayout;
+	ListView navListView;
+	private String[] opcionesMenu;
+	private ActionBarDrawerToggle drawerToggle;
 
 	@Override
 	protected void onCreate(Bundle saveInstanceState) {
@@ -75,12 +87,59 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 		// StrictMode.ThreadPolicy policy = new
 		// StrictMode.ThreadPolicy.Builder()
 		// .permitAll().build();
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setIcon(
-				getResources().getDrawable(R.drawable.titulo));
+		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-		getSupportActionBar().setBackgroundDrawable(
-				getResources().getDrawable(R.drawable.fondoabar));
+		navListView = (ListView) findViewById(R.id.left_drawer);
+		opcionesMenu = new String[] { "Ayuda", "Puntuar" };
+		navListView.setAdapter(new ArrayAdapter<String>(getActionBar()
+				.getThemedContext(), android.R.layout.simple_list_item_1,
+				opcionesMenu));
+		drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
+				R.drawable.ic_navigation_drawer, R.string.app_name,
+				R.string.app_name) {
+
+			public void onDrawerClosed(View view) {
+				ActivityCompat.invalidateOptionsMenu(Mapa.this);
+			}
+
+			public void onDrawerOpened(View drawerView) {
+				ActivityCompat.invalidateOptionsMenu(Mapa.this);
+			}
+		};
+
+		drawerLayout.setDrawerListener(drawerToggle);
+		getActionBar().setDisplayShowTitleEnabled(false);
+		getActionBar().setBackgroundDrawable(
+				new ColorDrawable(Color.parseColor("#30898e")));
+		getActionBar().setIcon(
+				getResources().getDrawable(R.drawable.titulo));
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
+
+		navListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int pos,
+					long id) {
+
+				view.setSelected(true);
+				switch (pos) {
+				case 0:
+
+					Intent intent = new Intent(Mapa.this, Ayuda.class);
+					startActivity(intent);
+					break;
+				case 1:
+
+					startActivity(new Intent(
+							Intent.ACTION_VIEW,
+							Uri.parse("https://play.google.com/store/apps/details?id=com.jldes.dondeaparque")));
+					break;
+
+				}
+				drawerLayout.closeDrawer(navListView);
+
+			}
+		});
 		// StrictMode.setThreadPolicy(policy);
 		ImageView imageView = (ImageView) findViewById(R.id.boton_pos);
 		imageView.setOnClickListener(new OnClickListener() {
@@ -167,6 +226,9 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		if (drawerToggle.onOptionsItemSelected(item)) {
+			return true;
+		}
 		switch (item.getItemId()) {
 		case R.id.compartir:
 			Geocoder geocoder = new Geocoder(Mapa.this, Locale.getDefault());
@@ -410,9 +472,9 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 			mapa.addMarker(yo);
 			// ruta();
 			if (condition) {
-				condition=!condition;
-				CameraPosition campos2 = new CameraPosition(new LatLng(lat2, lon2),
-						18, 60, location.getBearing());
+				condition = !condition;
+				CameraPosition campos2 = new CameraPosition(new LatLng(lat2,
+						lon2), 18, 60, location.getBearing());
 				CameraUpdate camUpd2 = CameraUpdateFactory
 						.newCameraPosition(campos2);
 				mapa.animateCamera(camUpd2);
@@ -588,4 +650,27 @@ public class Mapa extends ActionBarActivity implements LocationListener {
 		EasyTracker.getInstance(this).activityStop(this); // Add this method.
 	}
 
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+
+		boolean menuAbierto = drawerLayout.isDrawerOpen(navListView);
+
+		// if (menuAbierto)
+		// else
+		// menu.findItem(R.id.action_settings).setVisible(true);
+
+		return super.onPrepareOptionsMenu(menu);
+	}
+
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		drawerToggle.syncState();
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		drawerToggle.onConfigurationChanged(newConfig);
+	}
 }

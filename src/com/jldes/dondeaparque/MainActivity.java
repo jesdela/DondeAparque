@@ -1,11 +1,14 @@
 package com.jldes.dondeaparque;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,37 +17,31 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
-import com.google.ads.*;
-public class MainActivity extends ActionBarActivity implements LocationListener {
+
+public class MainActivity extends Activity implements LocationListener {
 	private LocationManager locationManager;
-	private AdView adView;
-	private final String TAPPX_KEY = "/120940746/Pub-1089-Android-7011";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setBackgroundDrawable(
-				getResources().getDrawable(R.drawable.fondoabar));
-		getSupportActionBar().setIcon(
+		getActionBar().setDisplayShowTitleEnabled(false);
+		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#30898e")));
+		getActionBar().setIcon(
 				getResources().getDrawable(R.drawable.titulo));
 		setContentView(R.layout.activity_main);
-		adView = new AdView(this, AdSize.SMART_BANNER, "ca-app-pub-9595013952750962/5592859939");
-//		adView.setAdUnitId("ca-app-pub-9595013952750962/5592859939");
-//		adView.setAdSize(AdSize.SMART_BANNER);
-		com.tappx.ads.exchange.Utils.InterstitialConfigureAndShow(
-				this, TAPPX_KEY);
-		RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.principal);
-		relativeLayout.addView(adView);
-		AdRequest adRequest = new AdRequest().addTestDevice("609C2C46CA7191C8618A1BCD374207EAD4211DA8");
-		adView.loadAd(adRequest);
+		// adView.setAdUnitId("ca-app-pub-9595013952750962/5592859939");
+		// adView.setAdSize(AdSize.SMART_BANNER);
+		// com.tappx.ads.exchange.Utils.BannerConfigureAndShowInRelativeLayout(this,
+		// p_layout_id, p_banner, p_key, p_relative_layout_params, p_auto_hide)
+		// com.tappx.ads.exchange.Utils.InterstitialConfigureAndShow(this,
+		// TAPPX_KEY);
+
 		comprovarconexion();
 		empezar();
 	}
@@ -52,14 +49,14 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
-//		adView.pause();
+		// adView.pause();
 		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
-//		adView.resume();
+		// adView.resume();
 		super.onResume();
 	}
 
@@ -271,14 +268,6 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-	 @Override
-	 protected void onDestroy() {
-	 // TODO Auto-generated method stub
-//		 adView.destroy();
-	 super.onDestroy();
-	
-	 }
 
 	@Override
 	public void onBackPressed() {

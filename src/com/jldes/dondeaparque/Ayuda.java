@@ -1,22 +1,23 @@
 package com.jldes.dondeaparque;
-
+ 
+import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
 import com.google.analytics.tracking.android.EasyTracker;
 
-public class Ayuda extends ActionBarActivity {
+public class Ayuda extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_ayuda);
-		getSupportActionBar().setBackgroundDrawable(
-				getResources().getDrawable(R.drawable.fondoabar));
-		getSupportActionBar().setIcon(
+		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#30898e")));
+		getActionBar().setIcon(
 				getResources().getDrawable(R.drawable.titulo));
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayShowTitleEnabled(false);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override

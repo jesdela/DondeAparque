@@ -1,17 +1,18 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:jldes="http://schemas.android.com/apk/res-auto" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
         android:id="@+id/ayuda"
+        android:title="Ayuda"
         android:icon="@android:drawable/ic_menu_help"
         android:orderInCategory="100"
-        jldes:showAsAction="always">
+        android:showAsAction="always">
     </item>
     <item
         android:id="@+id/puntuar"
+        android:title="Puntuar"
         android:icon="@drawable/ic_action_name"
         android:orderInCategory="100"
-        jldes:showAsAction="always">
+        android:showAsAction="always">
     </item>
 
 </menu>
