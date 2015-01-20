@@ -35,33 +35,11 @@ public class MainActivity extends Activity implements LocationListener {
 		getActionBar().setIcon(
 				getResources().getDrawable(R.drawable.titulo));
 		setContentView(R.layout.activity_main);
-		// adView.setAdUnitId("ca-app-pub-9595013952750962/5592859939");
-		// adView.setAdSize(AdSize.SMART_BANNER);
-		// com.tappx.ads.exchange.Utils.BannerConfigureAndShowInRelativeLayout(this,
-		// p_layout_id, p_banner, p_key, p_relative_layout_params, p_auto_hide)
-		// com.tappx.ads.exchange.Utils.InterstitialConfigureAndShow(this,
-		// TAPPX_KEY);
-
 		comprovarconexion();
 		empezar();
 	}
 
-	@Override
-	protected void onPause() {
-		// TODO Auto-generated method stub
-		// adView.pause();
-		super.onPause();
-	}
-
-	@Override
-	protected void onResume() {
-		// TODO Auto-generated method stub
-		// adView.resume();
-		super.onResume();
-	}
-
 	private void comprovarconexion() {
-		// TODO Auto-generated method stub
 		AlertDialog.Builder dialogo3 = new AlertDialog.Builder(this);
 		dialogo3.setMessage(
 				"Comprueva tu conexión de datos y vuelve a intentarlo")
@@ -72,7 +50,6 @@ public class MainActivity extends Activity implements LocationListener {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								// TODO Auto-generated method stub
 								comprovarconexion();
 							}
 						})
@@ -82,8 +59,6 @@ public class MainActivity extends Activity implements LocationListener {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								// TODO Auto-generated method
-								// stublocationManager
 								locationManager
 										.removeUpdates(MainActivity.this);
 								finish();
@@ -119,7 +94,6 @@ public class MainActivity extends Activity implements LocationListener {
 	}
 
 	private void empezar() {
-		// TODO Auto-generated method stub
 		SharedPreferences preferences = getSharedPreferences("opciones",
 				MODE_PRIVATE);
 		if (preferences.getBoolean("habil", false)) {
@@ -137,7 +111,6 @@ public class MainActivity extends Activity implements LocationListener {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				locationManager.removeUpdates(MainActivity.this);
 				actualizarPosicion(location);
 
@@ -146,7 +119,6 @@ public class MainActivity extends Activity implements LocationListener {
 	}
 
 	private void actualizarPosicion(Location location) {
-		// Obtenemos una referencia al LocationManager
 		if (location != null) {
 			SharedPreferences preferences = getSharedPreferences("opciones",
 					MODE_PRIVATE);
@@ -165,8 +137,6 @@ public class MainActivity extends Activity implements LocationListener {
 	}
 
 	public Dialog onCreateDialog(int id) {
-		// Use the Builder class for convenient dialog construction
-
 		AlertDialog dialog = null;
 		switch (id) {
 		case 0:
@@ -180,7 +150,6 @@ public class MainActivity extends Activity implements LocationListener {
 								}
 							});
 			dialog = dialogo0.create();
-			// Create the AlertDialog object and return i
 			break;
 		case 1:
 			AlertDialog.Builder dialogo1 = new AlertDialog.Builder(this);
@@ -201,11 +170,10 @@ public class MainActivity extends Activity implements LocationListener {
 								}
 							});
 			dialog = dialogo1.create();
-			// Create the AlertDialog object and return i
 			break;
 		case 2:
 			AlertDialog.Builder dialogo2 = new AlertDialog.Builder(this);
-			dialogo2.setMessage("¿Ativar servicios de ubicaión?")
+			dialogo2.setMessage("¿Activar servicios de ubicación?")
 					.setTitle("Servicios de ubicación inhabilitados")
 					.setPositiveButton("Aceptar",
 							new DialogInterface.OnClickListener() {
@@ -213,7 +181,6 @@ public class MainActivity extends Activity implements LocationListener {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									// TODO Auto-generated method stub
 									Intent actividad = new Intent(
 											Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 									startActivity(actividad);
@@ -226,8 +193,6 @@ public class MainActivity extends Activity implements LocationListener {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									// TODO Auto-generated method
-									// stublocationManager
 									locationManager
 											.removeUpdates(MainActivity.this);
 									finish();
@@ -246,14 +211,12 @@ public class MainActivity extends Activity implements LocationListener {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// TODO Auto-generated method stub
 		getMenuInflater().inflate(R.menu.main, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 		case R.id.ayuda:
 			startActivity(new Intent(MainActivity.this, Ayuda.class));
@@ -271,32 +234,24 @@ public class MainActivity extends Activity implements LocationListener {
 
 	@Override
 	public void onBackPressed() {
-		// TODO Auto-generated method stub
 		showDialog(1);
 	}
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
 		showDialog(2);
 	}
 
 	@Override
 	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

@@ -5,8 +5,7 @@
     android:versionName="8.5.2" >
 
     <uses-sdk
-        android:minSdkVersion="16"
-        android:targetSdkVersion="17" />
+        android:minSdkVersion="16" />
 
     <permission
         android:name="com.jldes.mapas.permission.MAPS_RECEIVE"

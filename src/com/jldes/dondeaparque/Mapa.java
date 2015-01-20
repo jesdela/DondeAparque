@@ -84,9 +84,6 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 	protected void onCreate(Bundle saveInstanceState) {
 		super.onCreate(saveInstanceState);
 		setContentView(R.layout.activity_mapas);
-		// StrictMode.ThreadPolicy policy = new
-		// StrictMode.ThreadPolicy.Builder()
-		// .permitAll().build();
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
 		navListView = (ListView) findViewById(R.id.left_drawer);
@@ -111,8 +108,7 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 		getActionBar().setDisplayShowTitleEnabled(false);
 		getActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#30898e")));
-		getActionBar().setIcon(
-				getResources().getDrawable(R.drawable.titulo));
+		getActionBar().setIcon(getResources().getDrawable(R.drawable.titulo));
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
 
@@ -140,13 +136,11 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 
 			}
 		});
-		// StrictMode.setThreadPolicy(policy);
 		ImageView imageView = (ImageView) findViewById(R.id.boton_pos);
 		imageView.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				CameraPosition campos2 = new CameraPosition(new LatLng(lat2,
 						lon2), 18, 0, 0);
 				CameraUpdate camUpd2 = CameraUpdateFactory
@@ -159,7 +153,6 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 	}
 
 	private void comprovarconexion() {
-		// TODO Auto-generated method stub
 		AlertDialog.Builder dialogo3 = new AlertDialog.Builder(this);
 		dialogo3.setMessage(
 				"Comprueva tu conexión de datos y vuelve a intentarlo")
@@ -170,7 +163,6 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								// TODO Auto-generated method stub
 								comprovarconexion();
 							}
 						})
@@ -180,8 +172,6 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								// TODO Auto-generated method
-								// stublocationManager
 								locationManager.removeUpdates(Mapa.this);
 								finish();
 								dialog.cancel();
@@ -217,7 +207,6 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu, menu);
 		menu.findItem(R.id.menu_coche).getIcon()
 				.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
@@ -243,7 +232,6 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 				}
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			break;
@@ -270,13 +258,11 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 
 	@Override
 	protected void onDestroy() {
-		// TODO Auto-generated method stub
 		locationManager.removeUpdates(this);
 		super.onDestroy();
 	}
 
 	private void empezar() {
-		// TODO Auto-generated method stub
 		SharedPreferences preferences = getSharedPreferences("opciones",
 				MODE_PRIVATE);
 		lat = preferences.getFloat("latitud", 0);
@@ -294,13 +280,10 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 
 			@Override
 			public void onMarkerDragStart(Marker marcador) {
-				// TODO Auto-generated method stub
-
 			}
 
 			@Override
 			public void onMarkerDragEnd(Marker marcador) {
-				// TODO Auto-generated method stub
 				coche.position(marcador.getPosition());
 				SharedPreferences preferences = getSharedPreferences(
 						"opciones", MODE_PRIVATE);
@@ -315,7 +298,6 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 
 			@Override
 			public void onMarkerDrag(Marker marcador) {
-				// TODO Auto-generated method stub
 				coche.position(marcador.getPosition());
 				SharedPreferences preferences = getSharedPreferences(
 						"opciones", MODE_PRIVATE);
@@ -341,19 +323,16 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				actualizarposicion(loc);
 			}
 		};
 		Thread tiempo = new Thread() {
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				try {
 					handler.post(runnable);
 				} catch (Exception e) {
 				}
-				// TODO: handle exception
 			}
 		};
 		tiempo.start();
@@ -447,7 +426,6 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 								@Override
 								public void onClick(DialogInterface dialog,
 										int which) {
-									// TODO Auto-generated method stub
 									Intent actividad = new Intent(
 											Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 									startActivity(actividad);
@@ -486,7 +464,6 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 	}
 
 	private void mostrarRuta(LatLng inicio, LatLng fin) {
-		// TODO Auto-generated method stub
 		PolylineOptions lineas = new PolylineOptions().add(inicio).add(fin);
 
 		lineas.width(8);
@@ -530,7 +507,6 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 			}
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -613,51 +589,41 @@ public class Mapa extends android.support.v4.app.FragmentActivity implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// TODO Auto-generated method stub
 		comprovarconexion();
 		actualizarposicion(location);
 	}
 
 	@Override
 	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
 		showDialog(3);
 	}
 
 	@Override
 	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		// The rest of your onStart() code.
-		EasyTracker.getInstance(this).activityStart(this); // Add this method.
+		EasyTracker.getInstance(this).activityStart(this); 
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
-		// The rest of your onStop() code.
-		EasyTracker.getInstance(this).activityStop(this); // Add this method.
+		EasyTracker.getInstance(this).activityStop(this); 
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 
 		boolean menuAbierto = drawerLayout.isDrawerOpen(navListView);
-
-		// if (menuAbierto)
-		// else
-		// menu.findItem(R.id.action_settings).setVisible(true);
 
 		return super.onPrepareOptionsMenu(menu);
 	}
